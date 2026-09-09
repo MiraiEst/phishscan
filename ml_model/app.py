@@ -12,13 +12,13 @@ import json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)
 model = joblib.load('model.pkl')
 
-GEMINI_API_KEY = "AIzaSyDzd0RbY_fjLxz6c4skGyHCDoODMPtwsng"
-
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 gemini_model = None
 
 
@@ -33,9 +33,9 @@ else:
     except Exception as e:
         print(f"Error saat inisialisasi Gemini AI Model: {str(e)}")
         gemini_model = None
-
-#Database
-uri = "mongodb+srv://Mirai:Mirai1405@cluster0.mh9axhq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+uri = os.getenv("MONGODB_URI")
+if not uri:
+    raise RuntimeError("Variabel lingkungan MONGODB_URI belum diatur.")
 client = MongoClient(uri, server_api=ServerApi('1'))
 try:
     client.admin.command('ping')
