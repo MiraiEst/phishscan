@@ -15,7 +15,7 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=os.getenv("FRONTEND_ORIGIN", "*").split(","))
 model = joblib.load('model.pkl')
 
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")

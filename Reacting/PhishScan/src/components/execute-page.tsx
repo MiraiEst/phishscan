@@ -2,22 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './global.css';
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001').replace(/\/$/, '');
+
 const ExecutePage: React.FC = () => {
 
   const [url, setUrl] = useState('');
-  const [result, setResult] = useState<any>(null);
   const navigate = useNavigate();
 
   const handleScan = async () => {
     if (!url) return alert('Harap masukkan URL!');
     try {
-      const response = await fetch('http://localhost:3000/api/scan', {
+      const response = await fetch(`${apiBaseUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
+
+      if (!response.ok) {
+        throw new Error(`API mengembalikan status ${response.status}`);
+      }
+
       const data = await response.json();
-      setResult(data);
       console.log('Hasil scan: ', data);
 
       if (data.isPhishing) {
@@ -28,6 +33,7 @@ const ExecutePage: React.FC = () => {
 
     } catch (error) {
       console.error('Error scanning URL:', error);
+      alert('Pemindaian gagal. Pastikan layanan API sedang aktif, lalu coba lagi.');
     }
   };
 
@@ -35,7 +41,7 @@ const ExecutePage: React.FC = () => {
     <div>
       <div className="top-left">
         <img
-          src="/public/Image/phish-small.svg"
+          src="/Image/phish-small.svg"
           alt="PhishScan Logo"
           className="logo"
         />

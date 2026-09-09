@@ -21,7 +21,7 @@ const PhishScanInfo: React.FC = () => {
   return (
     <div>
       <div className="top-left">
-        <img src="/public/Image/phish-small.svg" alt="PhishScan Logo" className="logo" />
+        <img src="/Image/phish-small.svg" alt="PhishScan Logo" className="logo" />
       </div>
 
       <section id="Learn-More">

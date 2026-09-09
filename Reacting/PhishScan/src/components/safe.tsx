@@ -7,7 +7,7 @@ const SafePage: React.FC = () => {
     <div>
       <div className="top-left">
         <img
-          src="/public/Image/phish-small.svg"
+          src="/Image/phish-small.svg"
           alt="PhishScan Logo"
           className="logo"
         />
