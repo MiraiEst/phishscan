@@ -5,7 +5,10 @@ import socket
 import math
 from urllib.parse import urlparse
 from datetime import datetime
-from whois_cache import load_whois_cache, save_whois_cache
+try:
+    from .whois_cache import load_whois_cache, save_whois_cache
+except ImportError:
+    from whois_cache import load_whois_cache, save_whois_cache
 
 def subdomain_count(url):
     try:

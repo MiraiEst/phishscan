@@ -3,20 +3,31 @@ import joblib
 import numpy as np
 from flask_cors import CORS
 from urllib.parse import urlparse
-from extract_fitur import subdomain_count, calculate_entropy, get_domain_age_days, is_ssl_valid, is_public_hosting
-from rule_based import rule_based_check
-from check_html_js import get_page_content
-from gemini_layer import analyze_phishing_url_gemini
+try:
+    # Package imports are used by Vercel's api/index.py entrypoint.
+    from .extract_fitur import subdomain_count, calculate_entropy, get_domain_age_days, is_ssl_valid, is_public_hosting
+    from .rule_based import rule_based_check
+    from .check_html_js import get_page_content
+    from .gemini_layer import analyze_phishing_url_gemini
+except ImportError:
+    # Direct execution (python ml_model/app.py) remains supported locally.
+    from extract_fitur import subdomain_count, calculate_entropy, get_domain_age_days, is_ssl_valid, is_public_hosting
+    from rule_based import rule_based_check
+    from check_html_js import get_page_content
+    from gemini_layer import analyze_phishing_url_gemini
 import google.generativeai as genai
 import json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv(Path(__file__).with_name('.env'))
 app = Flask(__name__)
 CORS(app, origins=os.getenv("FRONTEND_ORIGIN", "*").split(","))
-model = joblib.load('model.pkl')
+model = joblib.load(Path(__file__).with_name('model.pkl'))
 
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 gemini_model = None

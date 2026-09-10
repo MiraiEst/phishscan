@@ -1,6 +1,9 @@
 from urllib.parse import urlparse
 import re
-from extract_fitur import get_domain_age_days
+try:
+    from .extract_fitur import get_domain_age_days
+except ImportError:
+    from extract_fitur import get_domain_age_days
 
 PHISHING_KEYWORDS = ["login", "secure", "update", "account", "verify", "bank", "signin", "webscr", "ebayisapi", "paypal"]
 

@@ -1,7 +1,11 @@
 import json
 import os
+from pathlib import Path
 
-WHOIS_CACHE_FILE = 'whois_cache.json'
+if os.getenv('VERCEL'):
+    WHOIS_CACHE_FILE = '/tmp/phishscan_whois_cache.json'
+else:
+    WHOIS_CACHE_FILE = str(Path(__file__).with_name('whois_cache.json'))
 
 def load_whois_cache():
     """Load Whois cache"""
