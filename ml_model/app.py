@@ -15,7 +15,6 @@ except ImportError:
     from rule_based import rule_based_check
     from check_html_js import get_page_content
     from gemini_layer import analyze_phishing_url_gemini
-import google.generativeai as genai
 import json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -30,20 +29,10 @@ CORS(app, origins=os.getenv("FRONTEND_ORIGIN", "*").split(","))
 model = joblib.load(Path(__file__).with_name('model.pkl'))
 
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
-gemini_model = None
-
 
 if not GEMINI_API_KEY:
     print("⚠️ Peringatan: Variabel lingkungan GOOGLE_API_KEY tidak ditemukan.")
     print("Fungsi Gemini API mungkin tidak akan bekerja.")
-else:
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        gemini_model = genai.GenerativeModel('gemini-2.5-flash')
-        print("Gemini AI Model berhasil diinisialisasi.")
-    except Exception as e:
-        print(f"Error saat inisialisasi Gemini AI Model: {str(e)}")
-        gemini_model = None
 uri = os.getenv("MONGODB_URI")
 if not uri:
     raise RuntimeError("Variabel lingkungan MONGODB_URI belum diatur.")
@@ -111,10 +100,10 @@ def predict():
         
         # Layer 3 untuk Gemini
         if 0.1 <= prob <= 0.6:
-            if gemini_model:
+            if GEMINI_API_KEY:
                 print("Memanggil Gemini AI untuk analisis lebih lanjut (kasus ambigu ML)...")
 
-                result = analyze_phishing_url_gemini(gemini_model, url)
+                result = analyze_phishing_url_gemini(GEMINI_API_KEY, url)
                 
                 print(f"  Respon Gemini: is_phishing={result.get('is_phishing', 'N/A')}, confidence={result.get('confidence', 'N/A')}")
 

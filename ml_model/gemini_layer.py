@@ -1,7 +1,9 @@
 import json
-import google.generativeai as genai
 import requests
 from bs4 import BeautifulSoup
+
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_ENDPOINT = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 def get_page_content(url):
     try:
@@ -21,10 +23,10 @@ def get_page_content(url):
         return {"error": f"Gagal mengambil halaman: {str(e)}"}
 
 
-def analyze_phishing_url_gemini(model: genai.GenerativeModel(), url: str) -> dict:
+def analyze_phishing_url_gemini(api_key: str, url: str) -> dict:
     """
     Menganalisis URL phishing menggunakan Gemini API berdasarkan struktur URL.
-    Menerima objek model Gemini yang sudah dikonfigurasi sebelumnya (dari app.py).
+    Memanggil Gemini REST API langsung menggunakan api_key yang sudah dikonfigurasi (dari app.py).
     """
     if not url.startswith("http://") and not url.startswith("https://"):
         url = "http://" + url
@@ -74,9 +76,16 @@ def analyze_phishing_url_gemini(model: genai.GenerativeModel(), url: str) -> dic
     """
     
     try:
-        response = model.generate_content(prompt)
-        response_text = response.text.strip()
-        
+        api_response = requests.post(
+            GEMINI_ENDPOINT,
+            params={"key": api_key},
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=30,
+        )
+        api_response.raise_for_status()
+        response_json = api_response.json()
+        response_text = response_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+
         if response_text.startswith("```json"):
             response_text = response_text[len("```json"):].strip()
         if response_text.endswith("```"):
@@ -113,14 +122,6 @@ if __name__ == "__main__":
         print("Silakan atur variabel ini untuk menjalankan tes mandiri.")
         exit()
 
-    try:
-        genai.configure(api_key=api_key_test)
-        test_model = genai.GenerativeModel('gemini-1.5-flash')
-        print("Gemini API berhasil dikonfigurasi untuk tes mandiri.")
-    except Exception as e:
-        print(f"ERROR: Gagal menginisialisasi Gemini API untuk tes mandiri: {str(e)}")
-        exit()
-
     while True:
         user_input_url = input("\nMasukkan URL untuk dianalisis (ketik 'exit' untuk keluar): ")
 
@@ -134,7 +135,7 @@ if __name__ == "__main__":
 
         print(f"\nMenganalisis URL: {user_input_url}")
         
-        analysis_result = analyze_phishing_url_gemini(test_model, user_input_url)
+        analysis_result = analyze_phishing_url_gemini(api_key_test, user_input_url)
         
         print("\n--- Hasil Analisis ---")
         if analysis_result["is_phishing"]:
