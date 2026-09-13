@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/**/*.py": {
-      "excludeFiles": "{node_modules/**,Reacting/**,bagianReact/**,img/**,server/**,ml_model/data*.xlsx,ml_model/*.csv,ml_model/train_model.py,ml_model/extract_fitur_to_csv.py,ml_model/whois_cache.json,ml_model/model_report.txt,ml_model/feature_importance.png,ml_model/__pycache__/**,api/__pycache__/**}"
+      "excludeFiles": "{node_modules/**,Reacting/**,bagianReact/**,img/**,server/**,ml_model/*.csv,ml_model/*.xlsx,ml_model/__pycache__/**,api/__pycache__/**}"
     }
   }
 }
