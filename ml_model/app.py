@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
-import joblib
+import onnxruntime as ort
 import numpy as np
 from flask_cors import CORS
 from urllib.parse import urlparse
 try:
-    # Package imports are used by Vercel's api/index.py entrypoint.
+    # Package imports are used by Vercel's api/predict.py entrypoint.
     from .extract_fitur import subdomain_count, calculate_entropy, get_domain_age_days, is_ssl_valid, is_public_hosting
     from .rule_based import rule_based_check
     from .check_html_js import get_page_content
@@ -26,7 +26,8 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).with_name('.env'))
 app = Flask(__name__)
 CORS(app, origins=os.getenv("FRONTEND_ORIGIN", "*").split(","))
-model = joblib.load(Path(__file__).with_name('model.pkl'))
+model_session = ort.InferenceSession(str(Path(__file__).with_name('model.onnx')))
+model_input_name = model_session.get_inputs()[0].name
 
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
@@ -94,9 +95,10 @@ def predict():
             })
 
         # Layer 2 untuk Machine Learning
-        features = np.array([extract_features_from_url(url)])
-        prediction = model.predict(features)[0]
-        prob = model.predict_proba(features)[0][1]
+        features = np.array([extract_features_from_url(url)], dtype=np.float32)
+        onnx_labels, onnx_probs = model_session.run(None, {model_input_name: features})
+        prediction = onnx_labels[0]
+        prob = onnx_probs[0][1]
         
         # Layer 3 untuk Gemini
         if 0.1 <= prob <= 0.6:
