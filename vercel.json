@@ -1,8 +1,3 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "api/predict.py": {
-      "excludeFiles": "{ml_model/data*.xlsx,ml_model/*.csv,ml_model/train_model.py,ml_model/extract_fitur_to_csv.py}"
-    }
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
