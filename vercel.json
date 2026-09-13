@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pip install -r requirements.txt",
   "functions": {
     "api/**/*.py": {
       "excludeFiles": "{ml_model/data*.xlsx,ml_model/*.csv,ml_model/train_model.py,ml_model/extract_fitur_to_csv.py}"
