@@ -72,6 +72,7 @@ def extract_features_from_url(url):
     ]
 
 @app.route('/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST'])
 def predict():
     try:
         data = request.get_json()
